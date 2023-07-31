@@ -1,4 +1,4 @@
-package com.example.hm_neto_jdbc;
+package com.example.hm_neto_jdbc.repository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -11,14 +11,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Repository
-public class Repo {
-    @Autowired
+public class ProductFetchRepository {
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public ProductFetchRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
 
     private final String fetchProductSql = read("fetch_product.sql");
 
@@ -31,9 +35,9 @@ public class Repo {
         }
     }
 
-    public Optional<String> getProductName(String name){
+    public List<String> getProductName(String name){
         Map<String, String> map = new HashMap<>();
         map.put("customer_name", name);
-        return namedParameterJdbcTemplate.query(fetchProductSql, map, (rs, row) -> rs.getString("product_name")).stream().findAny();
+        return namedParameterJdbcTemplate.queryForList(fetchProductSql, map, String.class);
     }
 }
